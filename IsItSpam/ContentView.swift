@@ -25,7 +25,7 @@ struct ContentView: View {
                     .imageScale(.large)
                     .foregroundStyle(.tint)
             }
-            Text("Hello, world!")
+            
             HStack {
                 Button("Take Photo") {
                     pickerSource = .camera
