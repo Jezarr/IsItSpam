@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import FoundationModels
 
 struct ContentView: View {
     @State private var selectedImage: UIImage? = nil
@@ -70,10 +71,17 @@ struct ContentView: View {
                         isAIProcessing = true
                         aiResult = ""
                         Task {
-                            if let result = try? await analyzeSpamWithAppleIntelligence(text: recognizedText) {
-                                aiResult = result
-                            } else {
-                                aiResult = "Could not analyze text."
+                            do {
+                                let prompt = "Is the following text spam? Answer Yes or No.\n\(recognizedText)"
+                                let session = LanguageModelSession(instructions: """
+                                    You are a tech assistant that will provide information on whether or not content sent to you is spam or not
+                                    """
+                                )
+                                 
+                                let response = try await session.respond(to: prompt)
+                                aiResult = response.content
+                            } catch {
+                                aiResult = "Error: \(error.localizedDescription)"
                             }
                             isAIProcessing = false
                         }
@@ -133,17 +141,17 @@ struct ImagePicker: UIViewControllerRepresentable {
     ContentView()
 }
 
-@MainActor
-func analyzeSpamWithAppleIntelligence(text: String) async throws -> String {
-    // let session = LanguageModelSession()
-    // Replace with the actual FoundationModels API call when available
-    // Example using NLLanguageModel (pseudo-code):
-    /*
-    let model = try await NLLanguageModel(named: "foundation-mistral-7b-instruct")
-    let prompt = "Is the following text spam? Answer Yes or No.\n\(text)"
-    let result = try await model.generate(prompt: prompt)
-    return result.text
-    */
-    // Placeholder for demonstration:
-    return "[Apple Intelligence response here]"let session = LanguageModelSession()
-}
+//@MainActor
+//func analyzeSpamWithAppleIntelligence(text: String) async throws -> String {
+//    // let session = LanguageModelSession()
+//    // Replace with the actual FoundationModels API call when available
+//    // Example using NLLanguageModel (pseudo-code):
+//    /*
+//    let model = try await NLLanguageModel(named: "foundation-mistral-7b-instruct")
+//    let prompt = "Is the following text spam? Answer Yes or No.\n\(text)"
+//    let result = try await model.generate(prompt: prompt)
+//    return result.text
+//    */
+//    // Placeholder for demonstration:
+//    return "[Apple Intelligence response here]"let session = LanguageModelSession()
+//}
